@@ -1,5 +1,8 @@
 # galaxeye-tilescope
 
+![Project Logo](assets/AOI_galaxeye.jpg)
+
+
 
 
 ##  Tech Stack
