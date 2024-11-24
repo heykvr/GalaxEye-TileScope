@@ -1,6 +1,6 @@
 # galaxeye-tilescope
 
-![Project Logo](assets/AOI_galaxeye.jpg)
+![Project UI](assets/AOI_GalaxEye.jpg)
 
 
 
