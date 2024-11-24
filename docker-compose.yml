@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - 3000:80
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://backend:5000
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - 5000:5000
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/geoData
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  data_population:
+    build:
+      context: ./backend
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/geoData
+    depends_on:
+      - mongo
+    command: ["node", "populateFeatures.js"]
+    networks:
+      - app-network
+    restart: "no"
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

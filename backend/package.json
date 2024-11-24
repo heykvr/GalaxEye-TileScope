@@ -1,0 +1,30 @@
+{
+  "name": "galaxyeye",
+  "version": "1.0.0",
+  "description": "backend for galaxeye",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heykvr/task_galaxeye.git"
+  },
+  "author": "Venkata ramana Kondapalli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/heykvr/task_galaxeye/issues"
+  },
+  "homepage": "https://github.com/heykvr/task_galaxeye#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.2",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
