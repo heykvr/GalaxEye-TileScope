@@ -1,62 +1,65 @@
-const express = require('express');
-const { MongoClient } = require('mongodb');
-const cors = require('cors');
-
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 const app = express();
 app.use(cors());
 app.use(express.json());
+const mongoURI = process.env.DATABASE_URL || `mongodb://mongo:27017/geoData`;
 
-const client = new MongoClient(process.env.DATABASE_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+const featureSchema = new mongoose.Schema({
+  type: { type: String, required: true },
+  properties: {
+    fill: { type: String, required: true },
+  },
+  geometry: {
+    type: { type: String, required: true },
+    coordinates: { type: [[[Number]]], required: true },
+  },
 });
 
+const Feature = mongoose.model("Feature", featureSchema);
 
-const dbName = 'geoData'; 
-const collectionName = 'features'; 
+async function connectDB() {
+  try {
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    process.exit(1);
+  }
+}
 
-
-app.post('/api/tiles/intersect', async (req, res) => {
+app.post("/api/tiles/intersect", async (req, res) => {
   try {
     const { aoi } = req.body;
-    console.log("aoi",aoi);
     if (!aoi || !aoi.coordinates) {
-      return res.status(400).json({ error: 'Invalid AOI' });
+      return res.status(400).json({ error: "Invalid AOI" });
     }
 
-    
-    await client.connect();
-    const db = client.db(dbName);
-    const collections = await db.listCollections().toArray();
-  
-    console.log('Collections:', collections.map(col => col.name));
-    const tilesCollection = db.collection(collectionName);
-
- 
     const query = {
       geometry: {
         $geoIntersects: {
           $geometry: {
-            type: 'Polygon',
+            type: "Polygon",
             coordinates: aoi.coordinates,
           },
         },
       },
     };
 
-
-    const tiles = await tilesCollection.find(query).toArray();
-
+    const tiles = await Feature.find(query);
     res.json(tiles);
   } catch (error) {
-    console.error('Error finding intersecting tiles:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  } finally {
-    await client.close();
+    console.error("Error finding intersecting tiles:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`Server running on port ${PORT}`);
 });
